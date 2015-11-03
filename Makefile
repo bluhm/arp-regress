@@ -76,6 +76,12 @@ run-regress-ping:
 	ping -n -c 1 ${${ip}}
 .endfor
 
+TARGETS +=	arp-request
+run-regress-arp-request:
+	@echo '\n======== $@ ========'
+	@echo Send ARP request for ${DST_IN} and expect reply from ${DST_MAC}
+	${SUDO} ${PYTHON}arp_request.py
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
