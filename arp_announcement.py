@@ -44,6 +44,7 @@ if e and e.type == ETH_P_ARP:
 	if a.pdst != DST_IN:
 		print "PDST=%s != DST_IN" % (a.pdst)
 		exit(1)
+	print "arp reply"
 	exit(0)
 
 print "NO ARP REPLY"

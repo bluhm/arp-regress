@@ -43,6 +43,7 @@ if e and e.type == ETH_P_ARP:
 	if a.pdst != SRC_OUT:
 		print "PDST=%s != SRC_OUT" % (a.pdst)
 		exit(1)
+	print "arp reply"
 	exit(0)
 
 print "NO ARP REPLY"
