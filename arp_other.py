@@ -1,14 +1,12 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol Request to modify fake address
-# expect Address Resolution Protocol response and check all fields
-# RFC 826  An Ethernet Address Resolution Protocol
-# Packet Generation
+# send Address Resolution Protocol Request to modify other address
+# expect no answer
 
 import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc=FAKE_ADDR,
+arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc=OTHER_ADDR,
     hwdst="ff:ff:ff:ff:ff:ff", pdst=REMOTE_ADDR)
 eth=Ether(src=LOCAL_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 

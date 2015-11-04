@@ -20,6 +20,7 @@ regress:
 # LOCAL is the machine where this makefile is running.
 # REMOTE is running OpenBSD with ARP to test the Address Resolution Protocol.
 # FAKE is an non existing machine, its IP is used in the tests.
+# OTHER is an IP on REMOTE, but configured on another interface
 
 # Configure Addresses on the machines.
 # Adapt interface and addresse variables to your local setup.
@@ -34,11 +35,11 @@ REMOTE_ADDR ?=
 
 .if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
     empty (REMOTE_SSH) || empty (LOCAL_ADDR) || empty (REMOTE_ADDR) || \
-    empty (FAKE_ADDR)
+    empty (FAKE_ADDR) || empty (OTHER_ADDR)
 regress:
 	@echo this tests needs a remote machine to operate on
 	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC REMOTE_SSH
-	@echo LOCAL_ADDR REMOTE_ADDR FAKE_ADDR are empty
+	@echo LOCAL_ADDR REMOTE_ADDR FAKE_ADDR OTHER_ADDR are empty
 	@echo fill out these variables for additional tests
 .endif
 
@@ -50,7 +51,7 @@ addr.py: Makefile
 	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
 	echo 'LOCAL_MAC = "${LOCAL_MAC}"' >>$@.tmp
 	echo 'REMOTE_MAC = "${REMOTE_MAC}"' >>$@.tmp
-.for var in LOCAL_ADDR REMOTE_ADDR FAKE_ADDR
+.for var in LOCAL_ADDR REMOTE_ADDR FAKE_ADDR OTHER_ADDR
 	echo '${var} = "${${var}}"' >>$@.tmp
 .endfor
 	mv $@.tmp $@
@@ -156,6 +157,19 @@ run-regress-arp-permanent: addr.py
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to overwrite permanent entry for ${FAKE_ADDR} by ${LOCAL_MAC}' diff.log
 	grep '^${FAKE_ADDR} .* 12:23:56:78:9a:bc .* permanent' arp.log
+
+TARGETS +=	arp-interface
+run-regress-arp-interface: addr.py
+	@echo '\n======== $@ ========'
+	@echo Send ARP Request to change address on other interface
+	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
+	scp ${REMOTE_SSH}:/var/log/messages old.log
+	${SUDO} ${PYTHON}arp_other.py
+	scp ${REMOTE_SSH}:/var/log/messages new.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	diff old.log new.log | grep '^> ' >diff.log
+	grep 'bsd: arp: attempt to overwrite permanent entry for ${OTHER_ADDR} by ${LOCAL_MAC}' diff.log
+	grep '^${OTHER_ADDR} .* permanent' arp.log
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 

@@ -1,8 +1,6 @@
 #!/usr/local/bin/python2.7
 # send Address Resolution Protocol Request to modify fake address
-# expect Address Resolution Protocol response and check all fields
-# RFC 826  An Ethernet Address Resolution Protocol
-# Packet Generation
+# expect no answer
 
 import os
 from addr import *
