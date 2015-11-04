@@ -76,7 +76,7 @@ run-regress-ping:
 	ping -n -c 1 ${${ip}}
 .endfor
 
-.for type in request probe announcement
+.for type in request probe announcement gratuitous
 TARGETS +=	arp-${type}
 run-regress-arp-${type}:
 	@echo '\n======== $@ ========'
