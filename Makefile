@@ -77,7 +77,7 @@ run-regress-ping:
 	ping -n -c 1 ${${ip}}
 .endfor
 
-.for type in request probe gratuitous multicast
+.for type in request probe multicast
 TARGETS +=	arp-${type}
 run-regress-arp-${type}:
 	@echo '\n======== $@ ========'
@@ -103,6 +103,17 @@ run-regress-arp-announcement:
 	ssh ${DST_SSH} logger -t "arp-regress[$$$$]" $@
 	ssh ${DST_SSH} cat /var/log/messages >old.log
 	${SUDO} ${PYTHON}arp_announcement.py
+	ssh ${DST_SSH} cat /var/log/messages >new.log
+	diff old.log new.log | grep '^> ' >diff.log
+	grep 'bsd: duplicate IP address ${DST_IN} sent from ethernet address ${SRC_MAC}' diff.log
+
+TARGETS +=	arp-gratuitous
+run-regress-arp-gratuitous:
+	@echo '\n======== $@ ========'
+	@echo Send Gratuitous ARP for DST_IN ${DST_IN} 
+	ssh ${DST_SSH} logger -t "arp-regress[$$$$]" $@
+	ssh ${DST_SSH} cat /var/log/messages >old.log
+	${SUDO} ${PYTHON}arp_gratuitous.py
 	ssh ${DST_SSH} cat /var/log/messages >new.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: duplicate IP address ${DST_IN} sent from ethernet address ${SRC_MAC}' diff.log
