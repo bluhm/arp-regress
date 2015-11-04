@@ -88,7 +88,12 @@ TARGETS +=	arp-etherbcast
 run-regress-arp-etherbcast:
 	@echo '\n======== $@ ========'
 	@echo Send ARP with ethernet broadcast sender hardware address
+	ssh q70 logger -t "run-regress[$$$$]" $@
+	ssh q70 cat /var/log/messages >old.log
 	${SUDO} ${PYTHON}arp_etherbcast.py
+	ssh q70 cat /var/log/messages >new.log
+	diff old.log new.log | grep '^> ' >diff.log
+	grep 'bsd: arp: ether address is broadcast for IP address ${SRC_OUT}' diff.log
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
