@@ -1,12 +1,15 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol request 
+# send Address Resolution Protocol Request 
 # expect Address Resolution Protocol response and check all fields
+# RFC 826  An Ethernet Address Resolution Protocol
+# Packet Generation
 
 import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc=SRC_MAC, psrc=SRC_OUT, pdst=DST_IN)
+arp=ARP(op='who-has', hwsrc=SRC_MAC, psrc=SRC_OUT,
+    hwdst="ff:ff:ff:ff:ff:ff", pdst=DST_IN)
 eth=Ether(src=SRC_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
 e=srp1(eth, iface=SRC_IF, timeout=2)

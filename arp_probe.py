@@ -1,6 +1,9 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol probe
+# send Address Resolution Protocol Probe
 # expect Address Resolution Protocol response and check all fields
+# RFC 5227  IPv4 Address Conflict Detection
+# 2.1.1.  Probe Details
+
 
 import os
 from addr import *

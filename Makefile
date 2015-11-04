@@ -76,17 +76,13 @@ run-regress-ping:
 	ping -n -c 1 ${${ip}}
 .endfor
 
-TARGETS +=	arp-request
-run-regress-arp-request:
+.for type in request probe announcement
+TARGETS +=	arp-${type}
+run-regress-arp-${type}:
 	@echo '\n======== $@ ========'
-	@echo Send ARP request for ${DST_IN} and expect reply from ${DST_MAC}
-	${SUDO} ${PYTHON}arp_request.py
-
-TARGETS +=	arp-probe
-run-regress-arp-probe:
-	@echo '\n======== $@ ========'
-	@echo Send ARP probe for ${DST_IN} and expect reply from ${DST_MAC}
-	${SUDO} ${PYTHON}arp_probe.py
+	@echo Send ARP ${type} for ${DST_IN} and expect reply from ${DST_MAC}
+	${SUDO} ${PYTHON}arp_${type}.py
+.endfor
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
