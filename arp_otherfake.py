@@ -1,12 +1,12 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol Request to modify other address
+# send Address Resolution Protocol Request to modify other fake address
 # expect no answer
 
 import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc=OTHER_ADDR,
+arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc=OTHERFAKE_ADDR,
     hwdst="ff:ff:ff:ff:ff:ff", pdst=REMOTE_ADDR)
 eth=Ether(src=LOCAL_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
