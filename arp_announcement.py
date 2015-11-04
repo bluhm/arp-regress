@@ -8,8 +8,8 @@ import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc=DST_IN,
-    hwdst="00:00:00:00:00:00", pdst=DST_IN)
+arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc=REMOTE_IN,
+    hwdst="00:00:00:00:00:00", pdst=REMOTE_IN)
 eth=Ether(src=LOCAL_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
 e=srp1(eth, iface=LOCAL_IF, timeout=2)
@@ -32,17 +32,17 @@ if e and e.type == ETH_P_ARP:
 	if a.op != 2:
 		print "OP=%s != is-at" % (a.op)
 		exit(1)
-	if a.hwsrc != DST_MAC:
-		print "HWLOCAL=%s != DST_MAC" % (a.hwsrc)
+	if a.hwsrc != REMOTE_MAC:
+		print "HWLOCAL=%s != REMOTE_MAC" % (a.hwsrc)
 		exit(1)
-	if a.psrc != DST_IN:
-		print "PLOCAL=%s != DST_IN" % (a.psrc)
+	if a.psrc != REMOTE_IN:
+		print "PLOCAL=%s != REMOTE_IN" % (a.psrc)
 		exit(1)
 	if a.hwdst != LOCAL_MAC:
-		print "HWDST=%s != LOCAL_MAC" % (a.hwdst)
+		print "HWREMOTE=%s != LOCAL_MAC" % (a.hwdst)
 		exit(1)
-	if a.pdst != DST_IN:
-		print "PDST=%s != DST_IN" % (a.pdst)
+	if a.pdst != REMOTE_IN:
+		print "PREMOTE=%s != REMOTE_IN" % (a.pdst)
 		exit(1)
 	print "arp reply"
 	exit(0)
