@@ -20,7 +20,9 @@ regress:
 # LOCAL is the machine where this makefile is running.
 # REMOTE is running OpenBSD with ARP to test the Address Resolution Protocol.
 # FAKE is an non existing machine, its IP is used in the tests.
-# OTHER is an IP on REMOTE, but configured on another interface
+# OTHER is an IP on REMOTE, but configured on another interface.
+# OTHERFAKE is an non existing IP on another interface.
+# REMOTE_SSH is the hostname to log in on the REMOTE machine.
 
 # Configure Addresses on the machines.
 # Adapt interface and addresse variables to your local setup.
@@ -30,8 +32,11 @@ LOCAL_MAC ?=
 REMOTE_MAC ?=
 REMOTE_SSH ?=
 
-LOCAL_ADDR ?=
-REMOTE_ADDR ?=
+LOCAL_ADDR ?= 10.188.70.17
+REMOTE_ADDR ?= 10.188.70.70
+FAKE_ADDR ?= 10.188.70.188
+OTHER_ADDR ?= 10.188.211.70
+OTHERFAKE_ADDR ?= 10.188.211.188
 
 .if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
     empty (REMOTE_SSH) || empty (LOCAL_ADDR) || empty (REMOTE_ADDR) || \
