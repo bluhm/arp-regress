@@ -1,5 +1,5 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol Request 
+# send Address Resolution Protocol Request with ethernet multicast sender
 # expect Address Resolution Protocol response and check all fields
 # RFC 826  An Ethernet Address Resolution Protocol
 # Packet Generation
@@ -8,7 +8,7 @@ import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc=SRC_MAC, psrc=SRC_OUT,
+arp=ARP(op='who-has', hwsrc="33:33:33:33:33:33", psrc=SRC_OUT,
     hwdst="ff:ff:ff:ff:ff:ff", pdst=DST_IN)
 eth=Ether(src=SRC_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
@@ -37,8 +37,8 @@ if e and e.type == ETH_P_ARP:
 	if a.psrc != DST_IN:
 		print "PSRC=%s != DST_IN" % (a.psrc)
 		exit(1)
-	if a.hwdst != SRC_MAC:
-		print "HWDST=%s != SRC_MAC" % (a.hwdst)
+	if a.hwdst != "33:33:33:33:33:33":
+		print "HWDST=%s != 33:33:33:33:33:33" % (a.hwdst)
 		exit(1)
 	if a.pdst != SRC_OUT:
 		print "PDST=%s != SRC_OUT" % (a.pdst)
