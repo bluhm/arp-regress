@@ -86,13 +86,26 @@ run-regress-arp-request:
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	grep '^${SRC_OUT} .* ${SRC_MAC} ' arp.log
 
-.for type in probe multicast
-TARGETS +=	arp-${type}
-run-regress-arp-${type}:
+TARGETS +=	arp-multicast
+run-regress-arp-multicast:
 	@echo '\n======== $@ ========'
-	@echo Send ARP ${type} for ${DST_IN} and expect reply from ${DST_MAC}
-	${SUDO} ${PYTHON}arp_${type}.py
-.endfor
+	@echo Send ARP from SRC_OUT ${SRC_OUT} with multicast ethernet address
+	ssh -t ${DST_SSH} logger -t "arp-regress[$$$$]" $@
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${SRC_OUT} ${SRC_MAC} temp
+	scp ${DST_SSH}:/var/log/messages old.log
+	${SUDO} ${PYTHON}arp_multicast.py
+	scp ${DST_SSH}:/var/log/messages new.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${SRC_OUT}
+	diff old.log new.log | grep '^> ' >diff.log
+	grep 'bsd: arp info overwritten for ${SRC_OUT} by 33:33:33:33:33:33' diff.log
+	grep '^${SRC_OUT} .* ${SRC_MAC} ' arp.log
+
+TARGETS +=	arp-probe
+run-regress-arp-probe:
+	@echo '\n======== $@ ========'
+	@echo Send ARP Probe for ${DST_IN} and expect reply from ${DST_MAC}
+	${SUDO} ${PYTHON}arp_probe.py
 
 TARGETS +=	arp-broadcast
 run-regress-arp-broadcast:
