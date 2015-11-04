@@ -1,13 +1,14 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol request 
+# send Address Resolution Protocol probe
 # expect Address Resolution Protocol response and check all fields
 
 import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc=SRC_MAC, psrc=SRC_OUT, pdst=DST_IN)
-eth=Ether(src=SRC_MAC)/arp
+arp=ARP(op='who-has', hwsrc=SRC_MAC, psrc="0.0.0.0",
+    hwdst="00:00:00:00:00:00", pdst=DST_IN)
+eth=Ether(src=SRC_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
 e=srp1(eth, iface=SRC_IF, timeout=2)
 
@@ -37,8 +38,8 @@ if e and e.type == ETH_P_ARP:
 	if a.hwdst != SRC_MAC:
 		print "HWDST=%s != SRC_MAC" % (a.hwdst)
 		exit(1)
-	if a.pdst != SRC_OUT:
-		print "PDST=%s != SRC_OUT" % (a.pdst)
+	if a.pdst != "0.0.0.0":
+		print "PDST=%s != 0.0.0.0" % (a.pdst)
 		exit(1)
 	exit(0)
 

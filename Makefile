@@ -82,6 +82,12 @@ run-regress-arp-request:
 	@echo Send ARP request for ${DST_IN} and expect reply from ${DST_MAC}
 	${SUDO} ${PYTHON}arp_request.py
 
+TARGETS +=	arp-probe
+run-regress-arp-probe:
+	@echo '\n======== $@ ========'
+	@echo Send ARP probe for ${DST_IN} and expect reply from ${DST_MAC}
+	${SUDO} ${PYTHON}arp_probe.py
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
