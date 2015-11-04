@@ -73,12 +73,12 @@ run-regress-ping:
 	@echo '\n======== $@ ========'
 	${SUDO} arp -da
 .for ip in LOCAL_ADDR REMOTE_ADDR
-	@echo Check ping ${ip}:
+	@echo Check ping ${ip}
 	ping -n -c 1 ${${ip}}
 .endfor
 
 TARGETS +=	arp-request
-run-regress-arp-request:
+run-regress-arp-request: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Request for REMOTE_ADDR ${REMOTE_ADDR} and set LOCAL_ADDR ${LOCAL_ADDR}
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_ADDR}
@@ -87,7 +87,7 @@ run-regress-arp-request:
 	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
 TARGETS +=	arp-multicast
-run-regress-arp-multicast:
+run-regress-arp-multicast: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP from LOCAL_ADDR ${LOCAL_ADDR} with multicast ethernet address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
@@ -102,13 +102,13 @@ run-regress-arp-multicast:
 	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
 TARGETS +=	arp-probe
-run-regress-arp-probe:
+run-regress-arp-probe: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Probe for ${REMOTE_ADDR} and expect reply from ${REMOTE_MAC}
 	${SUDO} ${PYTHON}arp_probe.py
 
 TARGETS +=	arp-broadcast
-run-regress-arp-broadcast:
+run-regress-arp-broadcast: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Request with ethernet broadcast sender hardware address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
@@ -119,7 +119,7 @@ run-regress-arp-broadcast:
 	grep 'bsd: arp: ether address is broadcast for IP address ${LOCAL_ADDR}' diff.log
 
 TARGETS +=	arp-announcement
-run-regress-arp-announcement:
+run-regress-arp-announcement: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Announcement for REMOTE_ADDR ${REMOTE_ADDR} 
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
@@ -132,7 +132,7 @@ run-regress-arp-announcement:
 	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent ' arp.log
 
 TARGETS +=	arp-gratuitous
-run-regress-arp-gratuitous:
+run-regress-arp-gratuitous: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send Gratuitous ARP for REMOTE_ADDR ${REMOTE_ADDR} 
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
