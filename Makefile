@@ -84,6 +84,12 @@ run-regress-arp-${type}:
 	${SUDO} ${PYTHON}arp_${type}.py
 .endfor
 
+TARGETS +=	arp-etherbcast
+run-regress-arp-etherbcast:
+	@echo '\n======== $@ ========'
+	@echo Send ARP with ethernet broadcast sender hardware address
+	${SUDO} ${PYTHON}arp_etherbcast.py
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
