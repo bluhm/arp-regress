@@ -85,13 +85,13 @@ run-regress-arp-${type}:
 	${SUDO} ${PYTHON}arp_${type}.py
 .endfor
 
-TARGETS +=	arp-etherbcast
-run-regress-arp-etherbcast:
+TARGETS +=	arp-broadcast
+run-regress-arp-broadcast:
 	@echo '\n======== $@ ========'
 	@echo Send ARP with ethernet broadcast sender hardware address
-	ssh ${DST_SSH} logger -t "run-regress[$$$$]" $@
+	ssh ${DST_SSH} logger -t "arp-regress[$$$$]" $@
 	ssh ${DST_SSH} cat /var/log/messages >old.log
-	${SUDO} ${PYTHON}arp_etherbcast.py
+	${SUDO} ${PYTHON}arp_broadcast.py
 	ssh ${DST_SSH} cat /var/log/messages >new.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: ether address is broadcast for IP address ${SRC_OUT}' diff.log
