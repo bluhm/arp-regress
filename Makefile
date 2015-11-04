@@ -126,8 +126,10 @@ run-regress-arp-announcement:
 	scp ${DST_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_announcement.py
 	scp ${DST_SSH}:/var/log/messages new.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: duplicate IP address ${DST_IN} sent from ethernet address ${SRC_MAC}' diff.log
+	grep '^${DST_IN} .* ${DST_MAC} .* permanent ' arp.log
 
 TARGETS +=	arp-gratuitous
 run-regress-arp-gratuitous:
@@ -137,8 +139,10 @@ run-regress-arp-gratuitous:
 	scp ${DST_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_gratuitous.py
 	scp ${DST_SSH}:/var/log/messages new.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: duplicate IP address ${DST_IN} sent from ethernet address ${SRC_MAC}' diff.log
+	grep '^${DST_IN} .* ${DST_MAC} .* permanent ' arp.log
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
