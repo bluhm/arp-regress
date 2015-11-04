@@ -40,7 +40,8 @@ REMOTE_ADDR ?=
     empty (REMOTE_SSH) || empty (LOCAL_ADDR) || empty (REMOTE_ADDR)
 regress:
 	@echo this tests needs a remote machine to operate on
-	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC REMOTE_SSH LOCAL_ADDR REMOTE_ADDR are empty
+	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC REMOTE_SSH
+	@echo LOCAL_ADDR REMOTE_ADDR are empty
 	@echo fill out these variables for additional tests
 .endif
 
