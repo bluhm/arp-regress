@@ -31,15 +31,16 @@ regress:
 SRC_IF ?=
 SRC_MAC ?=
 DST_MAC ?=
+DST_SSH ?=
 
 SRC_OUT ?=
 DST_IN ?=
 
 .if empty (SRC_IF) || empty (SRC_MAC) || empty (DST_MAC) || \
-    empty (SRC_OUT) || empty (DST_IN)
+    empty (DST_SSH) || empty (SRC_OUT) || empty (DST_IN)
 regress:
 	@echo this tests needs a remote machine to operate on
-	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT DST_IN are empty
+	@echo SRC_IF SRC_MAC DST_MAC DST_SSH SRC_OUT DST_IN are empty
 	@echo fill out these variables for additional tests
 .endif
 
@@ -88,10 +89,10 @@ TARGETS +=	arp-etherbcast
 run-regress-arp-etherbcast:
 	@echo '\n======== $@ ========'
 	@echo Send ARP with ethernet broadcast sender hardware address
-	ssh q70 logger -t "run-regress[$$$$]" $@
-	ssh q70 cat /var/log/messages >old.log
+	ssh ${DST_SSH} logger -t "run-regress[$$$$]" $@
+	ssh ${DST_SSH} cat /var/log/messages >old.log
 	${SUDO} ${PYTHON}arp_etherbcast.py
-	ssh q70 cat /var/log/messages >new.log
+	ssh ${DST_SSH} cat /var/log/messages >new.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: ether address is broadcast for IP address ${SRC_OUT}' diff.log
 
