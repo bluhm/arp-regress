@@ -77,7 +77,16 @@ run-regress-ping:
 	ping -n -c 1 ${${ip}}
 .endfor
 
-.for type in request probe multicast
+TARGETS +=	arp-request
+run-regress-arp-request:
+	@echo '\n======== $@ ========'
+	@echo Send ARP Request for DST_IN ${DST_IN} and set SRC_OUT ${SRC_OUT}
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${SRC_OUT}
+	${SUDO} ${PYTHON}arp_request.py
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	grep '^${SRC_OUT} .* ${SRC_MAC} ' arp.log
+
+.for type in probe multicast
 TARGETS +=	arp-${type}
 run-regress-arp-${type}:
 	@echo '\n======== $@ ========'
