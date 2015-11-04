@@ -1,5 +1,5 @@
 #!/usr/local/bin/python2.7
-# send Address Resolution Protocol Request 
+# send Address Resolution Protocol Request
 # expect Address Resolution Protocol response and check all fields
 # RFC 826  An Ethernet Address Resolution Protocol
 # Packet Generation

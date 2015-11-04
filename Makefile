@@ -119,7 +119,7 @@ run-regress-arp-broadcast: addr.py
 TARGETS +=	arp-announcement
 run-regress-arp-announcement: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send ARP Announcement for REMOTE_ADDR ${REMOTE_ADDR} 
+	@echo Send ARP Announcement for REMOTE_ADDR ${REMOTE_ADDR}
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_announcement.py
@@ -132,7 +132,7 @@ run-regress-arp-announcement: addr.py
 TARGETS +=	arp-gratuitous
 run-regress-arp-gratuitous: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send Gratuitous ARP for REMOTE_ADDR ${REMOTE_ADDR} 
+	@echo Send Gratuitous ARP for REMOTE_ADDR ${REMOTE_ADDR}
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_gratuitous.py
