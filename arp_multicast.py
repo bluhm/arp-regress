@@ -8,11 +8,11 @@ import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc="33:33:33:33:33:33", psrc=SRC_OUT,
+arp=ARP(op='who-has', hwsrc="33:33:33:33:33:33", psrc=LOCAL_OUT,
     hwdst="ff:ff:ff:ff:ff:ff", pdst=DST_IN)
-eth=Ether(src=SRC_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
+eth=Ether(src=LOCAL_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
-e=srp1(eth, iface=SRC_IF, timeout=2)
+e=srp1(eth, iface=LOCAL_IF, timeout=2)
 
 if e and e.type == ETH_P_ARP:
 	a=e.payload
@@ -32,16 +32,16 @@ if e and e.type == ETH_P_ARP:
 		print "OP=%s != is-at" % (a.op)
 		exit(1)
 	if a.hwsrc != DST_MAC:
-		print "HWSRC=%s != DST_MAC" % (a.hwsrc)
+		print "HWLOCAL=%s != DST_MAC" % (a.hwsrc)
 		exit(1)
 	if a.psrc != DST_IN:
-		print "PSRC=%s != DST_IN" % (a.psrc)
+		print "PLOCAL=%s != DST_IN" % (a.psrc)
 		exit(1)
 	if a.hwdst != "33:33:33:33:33:33":
 		print "HWDST=%s != 33:33:33:33:33:33" % (a.hwdst)
 		exit(1)
-	if a.pdst != SRC_OUT:
-		print "PDST=%s != SRC_OUT" % (a.pdst)
+	if a.pdst != LOCAL_OUT:
+		print "PDST=%s != LOCAL_OUT" % (a.pdst)
 		exit(1)
 	print "arp reply"
 	exit(0)

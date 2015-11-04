@@ -6,11 +6,11 @@ import os
 from addr import *
 from scapy.all import *
 
-arp=ARP(op='who-has', hwsrc="ff:ff:ff:ff:ff:ff", psrc=SRC_OUT,
+arp=ARP(op='who-has', hwsrc="ff:ff:ff:ff:ff:ff", psrc=LOCAL_OUT,
     hwdst="ff:ff:ff:ff:ff:ff", pdst=DST_IN)
-eth=Ether(src=SRC_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
+eth=Ether(src=LOCAL_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
-e=srp1(eth, iface=SRC_IF, timeout=2)
+e=srp1(eth, iface=LOCAL_IF, timeout=2)
 
 if e and e.type == ETH_P_ARP:
 	a=e.payload

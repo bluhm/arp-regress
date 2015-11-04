@@ -1,7 +1,7 @@
 Regression tests for ARP implementation in the kernel.
 
-The test suite runs on the machine SRC, the kernel under test is
-running on DST.  On SRC Scapy is generating ARP packes ans sends
-them to DST.  The replys to SRC are analyzed.  The kernel log files
+The test suite runs on the machine LOCAL, the kernel under test is
+running on DST.  On LOCAL Scapy is generating ARP packes ans sends
+them to DST.  The replys to LOCAL are analyzed.  The kernel log files
 are fetched from DST via SCP and grepped for messages.  The arp
 table of DST is inspected via SSH login.
