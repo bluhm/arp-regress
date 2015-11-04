@@ -33,14 +33,14 @@ LOCAL_MAC ?=
 REMOTE_MAC ?=
 REMOTE_SSH ?=
 
-LOCAL_OUT ?=
-REMOTE_IN ?=
+LOCAL_ADDR ?=
+REMOTE_ADDR ?=
 
 .if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
-    empty (REMOTE_SSH) || empty (LOCAL_OUT) || empty (REMOTE_IN)
+    empty (REMOTE_SSH) || empty (LOCAL_ADDR) || empty (REMOTE_ADDR)
 regress:
 	@echo this tests needs a remote machine to operate on
-	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC REMOTE_SSH LOCAL_OUT REMOTE_IN are empty
+	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC REMOTE_SSH LOCAL_ADDR REMOTE_ADDR are empty
 	@echo fill out these variables for additional tests
 .endif
 
@@ -52,7 +52,7 @@ addr.py: Makefile
 	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
 	echo 'LOCAL_MAC = "${LOCAL_MAC}"' >>$@.tmp
 	echo 'REMOTE_MAC = "${REMOTE_MAC}"' >>$@.tmp
-.for var in LOCAL_OUT REMOTE_IN
+.for var in LOCAL_ADDR REMOTE_ADDR
 	echo '${var} = "${${var}}"' >>$@.tmp
 .endfor
 	mv $@.tmp $@
@@ -72,7 +72,7 @@ TARGETS +=	ping
 run-regress-ping:
 	@echo '\n======== $@ ========'
 	${SUDO} arp -da
-.for ip in LOCAL_OUT REMOTE_IN
+.for ip in LOCAL_ADDR REMOTE_ADDR
 	@echo Check ping ${ip}:
 	ping -n -c 1 ${${ip}}
 .endfor
@@ -80,31 +80,31 @@ run-regress-ping:
 TARGETS +=	arp-request
 run-regress-arp-request:
 	@echo '\n======== $@ ========'
-	@echo Send ARP Request for REMOTE_IN ${REMOTE_IN} and set LOCAL_OUT ${LOCAL_OUT}
-	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_OUT}
+	@echo Send ARP Request for REMOTE_ADDR ${REMOTE_ADDR} and set LOCAL_ADDR ${LOCAL_ADDR}
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_ADDR}
 	${SUDO} ${PYTHON}arp_request.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
-	grep '^${LOCAL_OUT} .* ${LOCAL_MAC} ' arp.log
+	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
 TARGETS +=	arp-multicast
 run-regress-arp-multicast:
 	@echo '\n======== $@ ========'
-	@echo Send ARP from LOCAL_OUT ${LOCAL_OUT} with multicast ethernet address
+	@echo Send ARP from LOCAL_ADDR ${LOCAL_ADDR} with multicast ethernet address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
-	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${LOCAL_OUT} ${LOCAL_MAC} temp
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${LOCAL_ADDR} ${LOCAL_MAC} temp
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_multicast.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
-	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_OUT}
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: arp info overwritten for ${LOCAL_OUT} by 33:33:33:33:33:33' diff.log
-	grep '^${LOCAL_OUT} .* ${LOCAL_MAC} ' arp.log
+	grep 'bsd: arp info overwritten for ${LOCAL_ADDR} by 33:33:33:33:33:33' diff.log
+	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
 TARGETS +=	arp-probe
 run-regress-arp-probe:
 	@echo '\n======== $@ ========'
-	@echo Send ARP Probe for ${REMOTE_IN} and expect reply from ${REMOTE_MAC}
+	@echo Send ARP Probe for ${REMOTE_ADDR} and expect reply from ${REMOTE_MAC}
 	${SUDO} ${PYTHON}arp_probe.py
 
 TARGETS +=	arp-broadcast
@@ -116,33 +116,33 @@ run-regress-arp-broadcast:
 	${SUDO} ${PYTHON}arp_broadcast.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: arp: ether address is broadcast for IP address ${LOCAL_OUT}' diff.log
+	grep 'bsd: arp: ether address is broadcast for IP address ${LOCAL_ADDR}' diff.log
 
 TARGETS +=	arp-announcement
 run-regress-arp-announcement:
 	@echo '\n======== $@ ========'
-	@echo Send ARP Announcement for REMOTE_IN ${REMOTE_IN} 
+	@echo Send ARP Announcement for REMOTE_ADDR ${REMOTE_ADDR} 
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_announcement.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: duplicate IP address ${REMOTE_IN} sent from ethernet address ${LOCAL_MAC}' diff.log
-	grep '^${REMOTE_IN} .* ${REMOTE_MAC} .* permanent ' arp.log
+	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from ethernet address ${LOCAL_MAC}' diff.log
+	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent ' arp.log
 
 TARGETS +=	arp-gratuitous
 run-regress-arp-gratuitous:
 	@echo '\n======== $@ ========'
-	@echo Send Gratuitous ARP for REMOTE_IN ${REMOTE_IN} 
+	@echo Send Gratuitous ARP for REMOTE_ADDR ${REMOTE_ADDR} 
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_gratuitous.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: duplicate IP address ${REMOTE_IN} sent from ethernet address ${LOCAL_MAC}' diff.log
-	grep '^${REMOTE_IN} .* ${REMOTE_MAC} .* permanent ' arp.log
+	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from ethernet address ${LOCAL_MAC}' diff.log
+	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent ' arp.log
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 

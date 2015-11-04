@@ -10,7 +10,7 @@ from addr import *
 from scapy.all import *
 
 arp=ARP(op='who-has', hwsrc=LOCAL_MAC, psrc="0.0.0.0",
-    hwdst="00:00:00:00:00:00", pdst=REMOTE_IN)
+    hwdst="00:00:00:00:00:00", pdst=REMOTE_ADDR)
 eth=Ether(src=LOCAL_MAC, dst="ff:ff:ff:ff:ff:ff")/arp
 
 e=srp1(eth, iface=LOCAL_IF, timeout=2)
@@ -35,8 +35,8 @@ if e and e.type == ETH_P_ARP:
 	if a.hwsrc != REMOTE_MAC:
 		print "HWLOCAL=%s != REMOTE_MAC" % (a.hwsrc)
 		exit(1)
-	if a.psrc != REMOTE_IN:
-		print "PLOCAL=%s != REMOTE_IN" % (a.psrc)
+	if a.psrc != REMOTE_ADDR:
+		print "PLOCAL=%s != REMOTE_ADDR" % (a.psrc)
 		exit(1)
 	if a.hwdst != LOCAL_MAC:
 		print "HWREMOTE=%s != LOCAL_MAC" % (a.hwdst)
