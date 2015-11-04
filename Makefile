@@ -98,10 +98,10 @@ TARGETS +=	arp-broadcast
 run-regress-arp-broadcast:
 	@echo '\n======== $@ ========'
 	@echo Send ARP Request with ethernet broadcast sender hardware address
-	ssh ${DST_SSH} logger -t "arp-regress[$$$$]" $@
-	ssh ${DST_SSH} cat /var/log/messages >old.log
+	ssh -t ${DST_SSH} logger -t "arp-regress[$$$$]" $@
+	scp ${DST_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_broadcast.py
-	ssh ${DST_SSH} cat /var/log/messages >new.log
+	scp ${DST_SSH}:/var/log/messages new.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: ether address is broadcast for IP address ${SRC_OUT}' diff.log
 
@@ -109,10 +109,10 @@ TARGETS +=	arp-announcement
 run-regress-arp-announcement:
 	@echo '\n======== $@ ========'
 	@echo Send ARP Announcement for DST_IN ${DST_IN} 
-	ssh ${DST_SSH} logger -t "arp-regress[$$$$]" $@
-	ssh ${DST_SSH} cat /var/log/messages >old.log
+	ssh -t ${DST_SSH} logger -t "arp-regress[$$$$]" $@
+	scp ${DST_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_announcement.py
-	ssh ${DST_SSH} cat /var/log/messages >new.log
+	scp ${DST_SSH}:/var/log/messages new.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: duplicate IP address ${DST_IN} sent from ethernet address ${SRC_MAC}' diff.log
 
@@ -120,10 +120,10 @@ TARGETS +=	arp-gratuitous
 run-regress-arp-gratuitous:
 	@echo '\n======== $@ ========'
 	@echo Send Gratuitous ARP for DST_IN ${DST_IN} 
-	ssh ${DST_SSH} logger -t "arp-regress[$$$$]" $@
-	ssh ${DST_SSH} cat /var/log/messages >old.log
+	ssh -t ${DST_SSH} logger -t "arp-regress[$$$$]" $@
+	scp ${DST_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_gratuitous.py
-	ssh ${DST_SSH} cat /var/log/messages >new.log
+	scp ${DST_SSH}:/var/log/messages new.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: duplicate IP address ${DST_IN} sent from ethernet address ${SRC_MAC}' diff.log
 
