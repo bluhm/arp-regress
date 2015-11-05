@@ -12,3 +12,5 @@ to overwrite them with fake ARP packets.  Some addresses are on the
 REMOTE interface facing LOCAL other are on a second interface.  The
 ARP input code has different cases for that.  So all possible log
 messages from ARP input can be triggered by a subtest.
+
+Additionally check that REMOTE can answer a Proxy ARP Requests.

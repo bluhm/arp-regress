@@ -30,7 +30,7 @@ regress:
 LOCAL_IF ?=
 LOCAL_MAC ?=
 REMOTE_MAC ?=
-FAKE_MAC ?=
+FAKE_MAC ?= 12:34:56:78:9a:bc
 REMOTE_SSH ?=
 
 LOCAL_ADDR ?= 10.188.70.17
@@ -209,6 +209,16 @@ run-regress-arp-incomlete: addr.py
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to add entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
 	grep '^${OTHERFAKE_ADDR} .* (incomplete)' arp.log
+
+TARGETS +=	arp-proxy
+run-regress-arp-proxy: addr.py
+	@echo '\n======== $@ ========'
+	@echo Send ARP Request for fake address that is proxied
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${FAKE_ADDR} ${FAKE_MAC} pub
+	${SUDO} ${PYTHON}arp_proxy.py
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
+	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* static .* p' arp.log
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 

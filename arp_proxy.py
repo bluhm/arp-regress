@@ -29,13 +29,13 @@ if e and e.type == ETH_P_ARP:
 	if a.op != 2:
 		print "OP=%s != is-at" % (a.op)
 		exit(1)
-	if a.hwsrc != REMOTE_MAC:
-		print "HWLOCAL=%s != REMOTE_MAC" % (a.hwsrc)
+	if a.hwsrc != FAKE_MAC:
+		print "HWLOCAL=%s != FAKE_MAC" % (a.hwsrc)
 		exit(1)
-	if a.psrc != REMOTE_ADDR:
-		print "PLOCAL=%s != REMOTE_ADDR" % (a.psrc)
+	if a.psrc != FAKE_ADDR:
+		print "PLOCAL=%s != FAKE_ADDR" % (a.psrc)
 		exit(1)
-	if a.hwdst != FAKE_MAC:
+	if a.hwdst != LOCAL_MAC:
 		print "HWREMOTE=%s != LOCAL_MAC" % (a.hwdst)
 		exit(1)
 	if a.pdst != LOCAL_ADDR:
