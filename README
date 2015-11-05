@@ -1,4 +1,4 @@
-Regression tests for ARP implementation in the kernel.
+Regression tests for the ARP implementation in the kernel.
 
 The test suite runs on the machine LOCAL, the kernel under test is
 running on REMOTE.  On LOCAL Scapy is generating ARP packes and
