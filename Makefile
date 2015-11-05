@@ -30,6 +30,7 @@ regress:
 LOCAL_IF ?=
 LOCAL_MAC ?=
 REMOTE_MAC ?=
+FAKE_MAC ?=
 REMOTE_SSH ?=
 
 LOCAL_ADDR ?= 10.188.70.17
@@ -39,11 +40,12 @@ OTHER_ADDR ?= 10.188.211.70
 OTHERFAKE_ADDR ?= 10.188.211.188
 
 .if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
-    empty (REMOTE_SSH) || empty (LOCAL_ADDR) || empty (REMOTE_ADDR) || \
-    empty (FAKE_ADDR) || empty (OTHER_ADDR) || empty (OTHERFAKE_ADDR)
+    empty (FAKE_MAC) || empty (REMOTE_SSH) || empty (LOCAL_ADDR) || \
+    empty (REMOTE_ADDR) || empty (FAKE_ADDR) || empty (OTHER_ADDR) || \
+    empty (OTHERFAKE_ADDR)
 regress:
 	@echo this tests needs a remote machine to operate on
-	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC REMOTE_SSH LOCAL_ADDR
+	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC FAKE_MAC REMOTE_SSH LOCAL_ADDR
 	@echo REMOTE_ADDR FAKE_ADDR OTHER_ADDR OTHERFAKE_ADDR are empty
 	@echo fill out these variables for additional tests
 .endif
@@ -54,10 +56,11 @@ depend: addr.py
 addr.py: Makefile
 	rm -f $@ $@.tmp
 	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
-	echo 'LOCAL_MAC = "${LOCAL_MAC}"' >>$@.tmp
-	echo 'REMOTE_MAC = "${REMOTE_MAC}"' >>$@.tmp
-.for var in LOCAL_ADDR REMOTE_ADDR FAKE_ADDR OTHER_ADDR OTHERFAKE_ADDR
-	echo '${var} = "${${var}}"' >>$@.tmp
+.for var in LOCAL REMOTE FAKE
+	echo '${var}_MAC = "${${var}_MAC}"' >>$@.tmp
+.endfor
+.for var in LOCAL REMOTE FAKE OTHER OTHERFAKE
+	echo '${var}_ADDR = "${${var}_ADDR}"' >>$@.tmp
 .endfor
 	mv $@.tmp $@
 
@@ -154,7 +157,7 @@ run-regress-arp-permanent: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Request to change permanent fake address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
-	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${FAKE_ADDR} 12:23:56:78:9a:bc permanent
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${FAKE_ADDR} ${FAKE_MAC} permanent
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_fake.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
@@ -162,7 +165,7 @@ run-regress-arp-permanent: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to overwrite permanent entry for ${FAKE_ADDR} by ${LOCAL_MAC}' diff.log
-	grep '^${FAKE_ADDR} .* 12:23:56:78:9a:bc .* permanent' arp.log
+	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* permanent' arp.log
 
 TARGETS +=	arp-address
 run-regress-arp-address: addr.py
@@ -182,7 +185,7 @@ run-regress-arp-temporary: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Request to change temporary entry on other interface
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
-	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${OTHERFAKE_ADDR} 12:23:56:78:9a:bc temp
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${OTHERFAKE_ADDR} ${FAKE_MAC} temp
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_otherfake.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
@@ -190,7 +193,7 @@ run-regress-arp-temporary: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to overwrite entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
-	grep '^${OTHERFAKE_ADDR} .* 12:23:56:78:9a:bc' arp.log
+	grep '^${OTHERFAKE_ADDR} .* ${FAKE_MAC}' arp.log
 
 TARGETS +=	arp-incomlete
 run-regress-arp-incomlete: addr.py
