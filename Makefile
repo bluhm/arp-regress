@@ -85,7 +85,7 @@ run-regress-ping:
 TARGETS +=	arp-request
 run-regress-arp-request: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send ARP Request for REMOTE_ADDR ${REMOTE_ADDR} and set LOCAL_ADDR ${LOCAL_ADDR}
+	@echo Send ARP Request for remote address and insert local address
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_ADDR}
 	${SUDO} ${PYTHON}arp_request.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
@@ -94,7 +94,7 @@ run-regress-arp-request: addr.py
 TARGETS +=	arp-multicast
 run-regress-arp-multicast: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send ARP from LOCAL_ADDR ${LOCAL_ADDR} with multicast ethernet address
+	@echo Send ARP Request and overwrite entry with multicast ethernet
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${LOCAL_ADDR} ${LOCAL_MAC} temp
 	scp ${REMOTE_SSH}:/var/log/messages old.log
@@ -109,13 +109,13 @@ run-regress-arp-multicast: addr.py
 TARGETS +=	arp-probe
 run-regress-arp-probe: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send ARP Probe for ${REMOTE_ADDR} and expect reply from ${REMOTE_MAC}
+	@echo Send ARP Probe for existing address and expect correct reply
 	${SUDO} ${PYTHON}arp_probe.py
 
 TARGETS +=	arp-broadcast
 run-regress-arp-broadcast: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send ARP Request with ethernet broadcast sender hardware address
+	@echo Send ARP Request with broadcast as sender hardware address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_broadcast.py
@@ -126,7 +126,7 @@ run-regress-arp-broadcast: addr.py
 TARGETS +=	arp-announcement
 run-regress-arp-announcement: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send ARP Announcement for REMOTE_ADDR ${REMOTE_ADDR}
+	@echo Send ARP Announcement for existing address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_announcement.py
@@ -139,7 +139,7 @@ run-regress-arp-announcement: addr.py
 TARGETS +=	arp-gratuitous
 run-regress-arp-gratuitous: addr.py
 	@echo '\n======== $@ ========'
-	@echo Send Gratuitous ARP for REMOTE_ADDR ${REMOTE_ADDR}
+	@echo Send Gratuitous ARP for existing address
 	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
 	scp ${REMOTE_SSH}:/var/log/messages old.log
 	${SUDO} ${PYTHON}arp_gratuitous.py
