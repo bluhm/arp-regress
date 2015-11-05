@@ -165,7 +165,7 @@ run-regress-arp-permanent: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to overwrite permanent entry for ${FAKE_ADDR} by ${LOCAL_MAC}' diff.log
-	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* permanent' arp.log
+	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* permanent ' arp.log
 
 TARGETS +=	arp-address
 run-regress-arp-address: addr.py
@@ -178,7 +178,7 @@ run-regress-arp-address: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to overwrite permanent entry for ${OTHER_ADDR} by ${LOCAL_MAC}' diff.log
-	grep '^${OTHER_ADDR} .* permanent' arp.log
+	grep '^${OTHER_ADDR} .* permanent ' arp.log
 
 TARGETS +=	arp-temporary
 run-regress-arp-temporary: addr.py
@@ -193,7 +193,7 @@ run-regress-arp-temporary: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to overwrite entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
-	grep '^${OTHERFAKE_ADDR} .* ${FAKE_MAC}' arp.log
+	grep '^${OTHERFAKE_ADDR} .* ${FAKE_MAC} ' arp.log
 
 TARGETS +=	arp-incomlete
 run-regress-arp-incomlete: addr.py
@@ -208,7 +208,7 @@ run-regress-arp-incomlete: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: attempt to add entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
-	grep '^${OTHERFAKE_ADDR} .* (incomplete)' arp.log
+	grep '^${OTHERFAKE_ADDR} .* (incomplete) ' arp.log
 
 TARGETS +=	arp-proxy
 run-regress-arp-proxy: addr.py
