@@ -192,6 +192,21 @@ run-regress-arp-temporary: addr.py
 	grep 'bsd: arp: attempt to overwrite entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
 	grep '^${OTHERFAKE_ADDR} .* 12:23:56:78:9a:bc' arp.log
 
+TARGETS +=	arp-incomlete
+run-regress-arp-incomlete: addr.py
+	@echo '\n======== $@ ========'
+	@echo Send ARP Request filling an incomplete entry on other interface
+	ssh -t ${REMOTE_SSH} logger -t "arp-regress[$$$$]" $@
+	ssh -t ${REMOTE_SSH} ${SUDO} ping -n -w 1 -c 1 ${OTHERFAKE_ADDR} || true
+	scp ${REMOTE_SSH}:/var/log/messages old.log
+	${SUDO} ${PYTHON}arp_otherfake.py
+	scp ${REMOTE_SSH}:/var/log/messages new.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
+	diff old.log new.log | grep '^> ' >diff.log
+	grep 'bsd: arp: attempt to add entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
+	grep '^${OTHERFAKE_ADDR} .* (incomplete)' arp.log
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
