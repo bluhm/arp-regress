@@ -106,7 +106,7 @@ run-regress-arp-multicast: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${LOCAL_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: arp info overwritten for ${LOCAL_ADDR} by 33:33:33:33:33:33' diff.log
+	grep 'bsd: arp: info overwritten for ${LOCAL_ADDR} by 33:33:33:33:33:33 on ' diff.log
 	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
 TARGETS +=	arp-probe
@@ -136,7 +136,7 @@ run-regress-arp-announcement: addr.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from ethernet address ${LOCAL_MAC}' diff.log
+	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from Ethernet address ${LOCAL_MAC}' diff.log
 	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent ' arp.log
 
 TARGETS +=	arp-gratuitous
@@ -149,7 +149,7 @@ run-regress-arp-gratuitous: addr.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from ethernet address ${LOCAL_MAC}' diff.log
+	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from Ethernet address ${LOCAL_MAC}' diff.log
 	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent ' arp.log
 
 TARGETS +=	arp-permanent
@@ -177,7 +177,7 @@ run-regress-arp-address: addr.py
 	scp ${REMOTE_SSH}:/var/log/messages new.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: arp: attempt to overwrite permanent entry for ${OTHER_ADDR} by ${LOCAL_MAC}' diff.log
+	grep 'bsd: arp: entry ${LOCAL_MAC} for ${OTHER_ADDR} received on incorrectifp ' diff.log
 	grep '^${OTHER_ADDR} .* permanent ' arp.log
 
 TARGETS +=	arp-temporary
@@ -192,7 +192,7 @@ run-regress-arp-temporary: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: arp: attempt to overwrite entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
+	grep 'bsd: arp: entry ${LOCAL_MAC} for ${OTHERFAKE_ADDR} received on incorrectifp ' diff.log
 	grep '^${OTHERFAKE_ADDR} .* ${FAKE_MAC} ' arp.log
 
 TARGETS +=	arp-incomlete
@@ -207,7 +207,7 @@ run-regress-arp-incomlete: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
 	diff old.log new.log | grep '^> ' >diff.log
-	grep 'bsd: arp: attempt to add entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
+	grep 'bsd: arp: entry ${LOCAL_MAC} for ${OTHERFAKE_ADDR} received on incorrectifp ' diff.log
 	grep '^${OTHERFAKE_ADDR} .* (incomplete) ' arp.log
 
 TARGETS +=	arp-proxy
