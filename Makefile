@@ -219,6 +219,13 @@ run-regress-arp-address: addr.py
 	grep 'bsd: arp: attempt to overwrite permanent entry for ${OTHER_ADDR} by ${LOCAL_MAC}' diff.log
 	grep '^${OTHER_ADDR} .* permanent * l$$' arp.log
 
+# The remote machine has a second address on another interface.  Add
+# a temporary ARP entry for a fake address in this network on the
+# remote machine.  The local machine tries to overwrite this address
+# with its own MAC.
+# Check that no answer is received.
+# Check that the attempt to overwrite the permanent entry is logged.
+# Check that the remote machine keeps its ARP entry.
 TARGETS +=	arp-temporary
 run-regress-arp-temporary: addr.py
 	@echo '\n======== $@ ========'
