@@ -292,6 +292,21 @@ run-regress-arp-nonproxy: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
 	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* static * $$' arp.log
 
+# Publish a proxy ARP entry on the remote machine for a fake address
+# on another interface.  The local machine requests this IP.  As the
+# proxy entry is for another interface, it must not be answered.
+# Check that no answer is received.
+# Check that the remote machine has a public ARP entry.
+TARGETS +=	arp-otherproxy
+run-regress-arp-otherproxy: addr.py
+	@echo '\n======== $@ ========'
+	@echo Send ARP Request for address proxied on another interface
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${OTHERFAKE_ADDR} ${FAKE_MAC} pub
+	${SUDO} ${PYTHON}arp_otherproxy.py
+	ssh ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${OTHERFAKE_ADDR}
+	grep '^${OTHERFAKE_ADDR} .* ${FAKE_MAC} .* static * p$$' arp.log
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
