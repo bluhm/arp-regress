@@ -263,6 +263,10 @@ run-regress-arp-incomlete: addr.py
 	grep 'bsd: arp: attempt to add entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
 	grep '^${OTHERFAKE_ADDR} .* (incomplete) ' arp.log
 
+# Publish a proxy ARP entry on the remote machine for a fake address.
+# The local machine requests this IP as a the target.
+# Check that all fields of the answer are filled out correctly.
+# Check that the remote machine has a public ARP entry.
 TARGETS +=	arp-proxy
 run-regress-arp-proxy: addr.py
 	@echo '\n======== $@ ========'
@@ -273,6 +277,11 @@ run-regress-arp-proxy: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
 	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* static * p$$' arp.log
 
+# Enter a static ARP entry on the remote machine for a fake address,
+# but do not publish it.  The local machine requests this IP as a the
+# target.
+# Check that no answer is received.
+# Check that the remote machine has a static ARP entry.
 TARGETS +=	arp-nonproxy
 run-regress-arp-nonproxy: addr.py
 	@echo '\n======== $@ ========'
