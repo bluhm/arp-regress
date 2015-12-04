@@ -148,7 +148,7 @@ run-regress-arp-broadcast: addr.py
 # remote machine must defend its IP address with an ARP reply.
 # Check that all fields of the answer are filled out correctly.
 # Check that the remote machine reports an duplicate address.
-# Check the te remote machine keeps its permanent ARP entry.
+# Check that the remote machine keeps its permanent ARP entry.
 TARGETS +=	arp-announcement
 run-regress-arp-announcement: addr.py
 	@echo '\n======== $@ ========'
@@ -162,6 +162,11 @@ run-regress-arp-announcement: addr.py
 	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from ethernet address ${LOCAL_MAC}' diff.log
 	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent * l$$' arp.log
 
+# The local machine sends an gratuitous ARP reply for the remote IP
+# with its local MAC.
+# Check that no answer is received.
+# Check that the remote machine reports an duplicate address.
+# Check that the remote machine keeps its permanent ARP entry.
 TARGETS +=	arp-gratuitous
 run-regress-arp-gratuitous: addr.py
 	@echo '\n======== $@ ========'
@@ -175,6 +180,12 @@ run-regress-arp-gratuitous: addr.py
 	grep 'bsd: duplicate IP address ${REMOTE_ADDR} sent from ethernet address ${LOCAL_MAC}' diff.log
 	grep '^${REMOTE_ADDR} .* ${REMOTE_MAC} .* permanent * l$$' arp.log
 
+# Add a permanent entry on the remote machine for a fake MAC and IP.
+# Send a request form the local machine, indicating with the local
+# MAC and the fake IP as sender that it claims the fake address.
+# Check that no answer is received.
+# Check that the remote machine reports an duplicate address.
+# Check that the remote machine keeps its permanent ARP entry.
 TARGETS +=	arp-permanent
 run-regress-arp-permanent: addr.py
 	@echo '\n======== $@ ========'
