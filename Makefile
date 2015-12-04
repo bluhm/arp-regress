@@ -72,8 +72,8 @@ PYTHON =	python2.7 ./
 PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 ${.CURDIR}/
 .endif
 
-# Clear arp cache and ping all addresses.  This ensures that
-# the ip addresses are configured and all routing table are set up
+# Clear ARP cache and ping all addresses.  This ensures that
+# the IP addresses are configured and all routing table are set up
 # to allow bidirectional packet flow.
 TARGETS +=	ping
 run-regress-ping:
@@ -85,6 +85,10 @@ run-regress-ping:
 	ping -n -c 1 ${${ip}}
 .endfor
 
+# Send an ARP request from the local machine, asking for the remote
+# machine's MAC.  Target MAC is broadcast, Target IP is remote address.
+# Check that all fields of the answer are filled out correctly.
+# Check that the remote machine has the local IP and MAC in its ARP table.
 TARGETS +=	arp-request
 run-regress-arp-request: addr.py
 	@echo '\n======== $@ ========'
@@ -94,6 +98,12 @@ run-regress-arp-request: addr.py
 	ssh ${REMOTE_SSH} ${SUDO} arp -an >arp.log
 	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
+# Send an ARP request from the local machine, but use a multicast MAC
+# as sender.  Although there is a special check in in_arpinput(),
+# this must be answered.  The ARP entry on the remote machine for the
+# local address is changed to the multicast MAC.
+# Check that all fields of the answer are filled out correctly.
+# Check that the remote machine overwrites the local address.
 TARGETS +=	arp-multicast
 run-regress-arp-multicast: addr.py
 	@echo '\n======== $@ ========'
@@ -109,12 +119,19 @@ run-regress-arp-multicast: addr.py
 	grep 'bsd: arp info overwritten for ${LOCAL_ADDR} by 33:33:33:33:33:33' diff.log
 	grep '^${LOCAL_ADDR} .* ${LOCAL_MAC} ' arp.log
 
+# Send an ARP probe from the local machine with the remote IP as
+# target.  Sender MAC is local and IP is 0.  The remote machine must
+# defend its IP address with an ARP reply.
+# Check that all fields of the answer are filled out correctly.
 TARGETS +=	arp-probe
 run-regress-arp-probe: addr.py
 	@echo '\n======== $@ ========'
 	@echo Send ARP Probe for existing address and expect correct reply
 	${SUDO} ${PYTHON}arp_probe.py
 
+# Send ARP request with broadcast MAC as sender.
+# Check that no answer is received.
+# Check that the remote machine rejects the broadcast sender.
 TARGETS +=	arp-broadcast
 run-regress-arp-broadcast: addr.py
 	@echo '\n======== $@ ========'
@@ -126,6 +143,12 @@ run-regress-arp-broadcast: addr.py
 	diff old.log new.log | grep '^> ' >diff.log
 	grep 'bsd: arp: ether address is broadcast for IP address ${LOCAL_ADDR}' diff.log
 
+# The local machine announces that it has taken the remote machine's
+# IP.  The sender is the local machines MAC and the remote IP.  The
+# remote machine must defend its IP address with an ARP reply.
+# Check that all fields of the answer are filled out correctly.
+# Check that the remote machine reports an duplicate address.
+# Check the te remote machine keeps its permanent ARP entry.
 TARGETS +=	arp-announcement
 run-regress-arp-announcement: addr.py
 	@echo '\n======== $@ ========'
