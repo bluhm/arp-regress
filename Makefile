@@ -220,6 +220,16 @@ run-regress-arp-proxy: addr.py
 	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
 	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* static .* p' arp.log
 
+TARGETS +=	arp-nonproxy
+run-regress-arp-nonproxy: addr.py
+	@echo '\n======== $@ ========'
+	@echo Send ARP Request for fake address that is not published
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -s ${FAKE_ADDR} ${FAKE_MAC}
+	${SUDO} ${PYTHON}arp_proxy.py
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -an >arp.log
+	ssh -t ${REMOTE_SSH} ${SUDO} arp -d ${FAKE_ADDR}
+	grep '^${FAKE_ADDR} .* ${FAKE_MAC} .* static  *$$' arp.log
+
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log
