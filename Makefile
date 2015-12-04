@@ -241,6 +241,13 @@ run-regress-arp-temporary: addr.py
 	grep 'bsd: arp: attempt to overwrite entry for ${OTHERFAKE_ADDR} on .* by ${LOCAL_MAC} on .*' diff.log
 	grep '^${OTHERFAKE_ADDR} .* ${FAKE_MAC} ' arp.log
 
+# The remote machine has a second address on another interface.  Create
+# an incomplete ARP entry for a fake address in this network on the
+# remote machine with an unsuccessful ping.  The local machine tries
+# to overwrite this address with its own MAC.
+# Check that no answer is received.
+# Check that the attempt to add an entry is logged.
+# Check that the remote machine keeps its incomplete ARP entry.
 TARGETS +=	arp-incomlete
 run-regress-arp-incomlete: addr.py
 	@echo '\n======== $@ ========'
