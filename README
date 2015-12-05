@@ -15,6 +15,7 @@ messages from ARP input can be triggered by a subtest.
 
 Additionally check that REMOTE can answer a Proxy ARP Requests.
 
+EXAMPLE
 
 To run this test I use the following configuration files.
 You should choose a different set of MAC and IP addresses.
