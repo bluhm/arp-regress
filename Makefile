@@ -1,4 +1,4 @@
-#	$OpenBSD: Makefile,v 1.7 2016/07/18 09:09:24 bluhm Exp $
+#	$OpenBSD: Makefile,v 1.9 2016/10/19 14:31:19 tb Exp $
 
 # The following ports must be installed:
 #
@@ -6,13 +6,16 @@
 # py-libdnet          python interface to libdnet
 # scapy               powerful interactive packet manipulation in python
 
+.if ! (make(clean) || make(cleandir) || make(obj))
 # Check wether all required python packages are installed.  If some
 # are missing print a warning and skip the tests, but do not fail.
 PYTHON_IMPORT != python2.7 -c 'from scapy.all import *' 2>&1 || true
+.endif
 .if ! empty(PYTHON_IMPORT)
 regress:
 	@echo '${PYTHON_IMPORT}'
 	@echo install python and the scapy module for additional tests
+	@echo SKIPPED
 .endif
 
 # This test needs a manual setup of two machines
@@ -49,6 +52,7 @@ regress:
 	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC FAKE_MAC REMOTE_SSH LOCAL_ADDR
 	@echo REMOTE_ADDR FAKE_ADDR OTHER_ADDR OTHERFAKE_ADDR are empty
 	@echo fill out these variables for additional tests
+	@echo SKIPPED
 .endif
 
 .if ! empty (REMOTE_SSH)
